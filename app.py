@@ -1,32 +1,31 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, render_template, request, send_file
 from TTS.api import TTS
 
 app = Flask(__name__)
 
-# Load model once
 tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        text = request.form["text"]
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-        tts.tts_to_file(
-            text=text,
-            speaker_wav="myvoice.wav",
-            language="en",
-            file_path="output.wav"
-        )
+@app.route("/generate", methods=["POST"])
+def generate():
 
-        return render_template("index.html", audio=True)
+    text = request.json["text"]
 
-    return render_template("index.html", audio=False)
+    tts.tts_to_file(
+        text=text,
+        speaker_wav="voice.wav",
+        language="en",
+        file_path="output.wav"
+    )
 
-
-@app.route("/audio")
-def audio():
-    return send_file("output.wav", mimetype="audio/wav")
-
+    return send_file(
+        "output.wav",
+        mimetype="audio/wav",
+        as_attachment=False
+    )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
