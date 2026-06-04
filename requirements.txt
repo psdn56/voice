@@ -1,5 +1,6 @@
-flask
-TTS
+Flask==3.0.0
+TTS==0.22.0
 torch
-transformers
-soundfile
+torchaudio
+pydub
+gunicorn
