@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Voice Creator Web App</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Voice Cloning App</title>
 </head>
 <body>
 
-<h1>🎤 Voice Creator</h1>
+<h2>🎙️ My AI Voice Clone</h2>
 
-<textarea id="text" placeholder="Type your text here..."></textarea>
+<form method="POST">
+    <textarea name="text" rows="6" cols="40"></textarea><br><br>
+    <button type="submit">Generate Voice</button>
+</form>
 
-<br>
+{% if audio %}
+    <h3>Output:</h3>
+    <audio controls>
+        <source src="/audio" type="audio/wav">
+    </audio>
+    <br>
+    <a href="/audio" download>Download</a>
+{% endif %}
 
-<select id="voiceSelect"></select>
-
-<br>
-
-<button onclick="speakText()">Play</button>
-<button onclick="stopVoice()">Stop</button>
-
-<script src="script.js"></script>
 </body>
 </html>
