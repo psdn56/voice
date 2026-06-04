@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 
-# Load model once (IMPORTANT for speed)
+# Load model ONCE (important)
 tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
 
 @app.route("/")
@@ -19,23 +19,26 @@ def generate():
     try:
         text = request.json["text"]
 
-        # Unique filename (prevents caching issues)
-        output_file = f"output_{int(time.time())}.wav"
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
 
-        # Generate speech
+        # unique file name (avoids overwrite issues)
+        filename = f"output_{int(time.time())}.wav"
+
+        # generate voice
         tts.tts_to_file(
             text=text,
             speaker_wav="voice.wav",
             language="en",
-            file_path=output_file
+            file_path=filename
         )
 
-        # Check if file is created properly
-        if not os.path.exists(output_file) or os.path.getsize(output_file) == 0:
+        # check file
+        if not os.path.exists(filename) or os.path.getsize(filename) == 0:
             return jsonify({"error": "Audio generation failed"}), 500
 
         return send_file(
-            output_file,
+            filename,
             mimetype="audio/wav",
             as_attachment=False,
             download_name="voice.wav"
@@ -46,4 +49,5 @@ def generate():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
