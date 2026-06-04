@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Voice Cloning App</title>
+    <title>Voice Generator</title>
 </head>
 <body>
 
-<h2>🎙️ My AI Voice Clone</h2>
+<h2>Text To Voice</h2>
 
-<form method="POST">
-    <textarea name="text" rows="6" cols="40"></textarea><br><br>
-    <button type="submit">Generate Voice</button>
-</form>
+<textarea id="text" rows="5" cols="50"></textarea>
+<br><br>
 
-{% if audio %}
-    <h3>Output:</h3>
-    <audio controls>
-        <source src="/audio" type="audio/wav">
-    </audio>
-    <br>
-    <a href="/audio" download>Download</a>
-{% endif %}
+<button onclick="generate()">Generate</button>
+
+<br><br>
+
+<audio id="audio" controls></audio>
+
+<script>
+function generate() {
+
+    let text = document.getElementById("text").value;
+
+    fetch("/generate",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            text:text
+        })
+    })
+    .then(r=>r.blob())
+    .then(blob=>{
+
+        let url = URL.createObjectURL(blob);
+
+        document.getElementById("audio").src = url;
+
+    });
+}
+</script>
 
 </body>
 </html>
