@@ -1,0 +1,5 @@
+flask
+TTS
+torch
+transformers
+soundfile
