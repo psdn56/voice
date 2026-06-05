@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, send_file, jsonify
-from TTS.api import TTS
 import os
 import time
 
 app = Flask(__name__)
+tts = None
 
 # IMPORTANT: don't load model at startup (prevents Render freeze)
 tts = None
