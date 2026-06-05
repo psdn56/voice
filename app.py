@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, send_file, jsonify
+from TTS.api import TTS
 import os
 import time
 
 app = Flask(__name__)
-tts = None
 
-# IMPORTANT: don't load model at startup (prevents Render freeze)
+# Lazy load model (IMPORTANT for Render)
 tts = None
 
 
@@ -51,10 +51,6 @@ def generate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# REQUIRED for Render + Gunicorn compatibility
-if __name__ != "__main__":
-    import gunicorn  # just ensures server mode
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
