@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, send_file, jsonify
-from TTS.api import TTS
 import os
 import time
 
 app = Flask(__name__)
 
-# Lazy load model (IMPORTANT for Render)
+# Lazy load (VERY IMPORTANT for Render)
 tts = None
 
 
@@ -14,20 +13,26 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/health")
+def health():
+    return "OK"
+
+
 @app.route("/generate", methods=["POST"])
 def generate():
     global tts
 
     try:
+        # Import TTS ONLY when needed (prevents startup crash)
+        if tts is None:
+            from TTS.api import TTS
+            tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
+
         data = request.get_json()
         text = data.get("text", "")
 
         if not text:
             return jsonify({"error": "No text provided"}), 400
-
-        # Load model only when first request comes
-        if tts is None:
-            tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
 
         filename = f"output_{int(time.time())}.wav"
 
@@ -37,9 +42,6 @@ def generate():
             language="en",
             file_path=filename
         )
-
-        if not os.path.exists(filename):
-            return jsonify({"error": "Audio generation failed"}), 500
 
         return send_file(
             filename,
@@ -52,6 +54,7 @@ def generate():
         return jsonify({"error": str(e)}), 500
 
 
+# IMPORTANT for Render + Gunicorn
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
