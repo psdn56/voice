@@ -1,6 +1,5 @@
-pip>=24.0
 Flask
-TTS
+TTS==0.22.0
 torch
 torchaudio
 gunicorn
